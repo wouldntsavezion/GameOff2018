@@ -5,8 +5,8 @@ public class PlayerController: MonoBehaviour {
     private float verticalInput;
     private float horizontalInput;
 
-    public float speed = 12f;
-    public float turnSpeed = 180f;
+    public float speed = 10f;
+    public float turnSpeed = 1f;
 
     private void Awake() {
         rigidBody = GetComponent<Rigidbody>();
@@ -22,8 +22,17 @@ public class PlayerController: MonoBehaviour {
     }
 
     private void Move() {
-        Vector3 movement = (Vector3.forward * verticalInput + Vector3.right * horizontalInput) * speed * Time.deltaTime;
+
+        // TODO : Fix possible Sqrt(2) Speed
+
+        Vector3 movement = new Vector3(horizontalInput, 0, verticalInput) * speed * Time.deltaTime;
         rigidBody.MovePosition(rigidBody.position + movement);
+
+        movement.Normalize();
+        if(movement != Vector3.zero) {
+            Quaternion newRotation = Quaternion.LookRotation(movement);
+            rigidBody.MoveRotation(Quaternion.Slerp(rigidBody.rotation, newRotation, Time.deltaTime * turnSpeed));
+        }
     }
 
 
